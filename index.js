@@ -3,31 +3,37 @@
 function task(i, done){
   setTimeout(()=>{
     console.log('task '+i)
-    done()
+    done(i==3 ? 'bad' : null)
   }, 1000)
 }
 
 let man = jobman({
-  allDone: man=>{
-    console.log(man.allDone)
+  allEnd: man=>{
+    console.log('all end', man.allEnd)
+    console.log('all state', man.jobs.map(fn=>fn.state))
     man.stop()
   },
-  jobDone: man=>{
-    console.log(man.allDone, man.jobEmpty, man.lastError, man.slot)
+  jobStart: (job, man)=>{
+    if(job.prop==5) return false
+  },
+  jobEnd: (job, man)=>{
+    console.log(man.allEnd, man.allEmpty, man.lastError, man.slot)
     // man.stop()
   },
-  jobEmpty: man=>{
-    console.log('queue become empty', man.jobEmpty, man.slot)
-  }
+  allEmpty: man=>{
+    console.log('queue become empty', man.allEmpty, man.slot)
+  },
+  autoStart: true
 })
-man.start()
+// man.start()
 
 console.log(man.slot)
 
-for(let i=0;i<10;i++)
-man.jobs.push(cb=>{
-  task(i, cb)
-})
+for(let i=0;i<10;i++){
+  man.add(cb=>{
+    task(i, cb)
+  }, i)
+}
 
 
 function jobman(config) {
@@ -42,10 +48,14 @@ function jobman(config) {
   const man = {
     config: config,
     jobs: jobs,
-    get allDone () {
+    add: function (fn, prop) {
+      jobs.push(fn)
+      fn.prop = prop
+    },
+    get allEnd () {
       return done
     },
-    get jobEmpty (){
+    get allEmpty (){
       return !jobs.some(pendingJob)
     },
     get slot(){
@@ -80,29 +90,34 @@ function jobman(config) {
 
     if(!fn) {
       if(!run && !done) {
-        console.log('all done')
+        // console.log('all done')
         done = true
-        config.allDone
-          ? config.allDone(man)
+        config.allEnd
+          ? config.allEnd(man)
           : stop()
       }
+      return
+    }
+
+    if(config.jobStart && config.jobStart(fn, man)===false) {
+      fn.state = 'cancel'
       return
     }
 
     done = false
     fn.state='run'
     fn(function next(err){
-      if(err) fn.state = 'err'
+      if(err!=null) fn.state = 'error'
       else fn.state = 'done'
       run--
       man.lastError = err
-      config.jobDone && config.jobDone(man)
+      config.jobEnd && config.jobEnd(fn, man)
     })
     run++
 
     if(pending.length===1) {
       // console.log('queue become empty')
-      config.jobEmpty && config.jobEmpty(man)
+      config.allEmpty && config.allEmpty(man)
     }
 
   }
