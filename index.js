@@ -7,59 +7,108 @@ function task(i, done){
   }, 1000)
 }
 
-let arr = jjob()
+let man = jobman({
+  allDone: man=>{
+    console.log(man.allDone)
+    man.stop()
+  },
+  jobDone: man=>{
+    console.log(man.allDone, man.jobEmpty, man.lastError, man.slot)
+    // man.stop()
+  },
+  jobEmpty: man=>{
+    console.log('queue become empty', man.jobEmpty, man.slot)
+  }
+})
+man.start()
+
+console.log(man.slot)
 
 for(let i=0;i<10;i++)
-arr.push(cb=>{
+man.jobs.push(cb=>{
   task(i, cb)
 })
 
-function jjob(config) {
+
+function jobman(config) {
   config = config || {}
+  config.max = config.max || 3
 
-  const arr = []
-
-  let con = 3
-  let jobDone = false
+  let interJob
+  let done = false
   let run = 0
 
-  function stop (){
-    clearInterval(inter1)    
+  const jobs = []
+  const man = {
+    config: config,
+    jobs: jobs,
+    get allDone () {
+      return done
+    },
+    get jobEmpty (){
+      return !jobs.some(pendingJob)
+    },
+    get slot(){
+      return config.max - run
+    },
+    stop: stop,
+    start: start,
   }
 
   function start(){
-    if(run>=con) return
-    const pending = arr.filter(f=>f.state===undefined)
+    if(interJob) {
+      console.warn('already started')
+      return
+    }
+    interJob = setInterval(check)
+    check()
+  }
+
+  function stop(){
+    clearInterval(interJob)
+    interJob=null
+  }
+  
+  function pendingJob (f) {
+    return f.state===undefined
+  }
+
+  function check(){
+    if(jobs.length===0 || run>=config.max) return
+    const pending = jobs.filter(pendingJob)
     const fn = pending[0]
 
     if(!fn) {
-      if(!run && !jobDone) {
+      if(!run && !done) {
         console.log('all done')
-        jobDone = true
-        config.onfinish
-          ? config.onfinish()
+        done = true
+        config.allDone
+          ? config.allDone(man)
           : stop()
       }
       return
     }
 
-    jobDone = false
+    done = false
     fn.state='run'
     fn(function next(err){
       if(err) fn.state = 'err'
       else fn.state = 'done'
       run--
+      man.lastError = err
+      config.jobDone && config.jobDone(man)
     })
     run++
 
     if(pending.length===1) {
-      console.log('queue become empty')
+      // console.log('queue become empty')
+      config.jobEmpty && config.jobEmpty(man)
     }
-    
+
   }
 
-  let inter1 = setInterval(start)
+  if(config.autoStart) start()
 
-  return arr
+  return man
 
 }
