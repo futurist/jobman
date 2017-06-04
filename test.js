@@ -1,8 +1,9 @@
 
-import ava from 'ava'
-import jobman from './'
+const ava = require('ava')
+const jobman = require('./')
+const got = require('got')
 
-ava.cb(t=>{
+ava.cb('example test', t=>{
   const testProps = [
     'insert to first!', 0,1,2,3,4,6,7,8,9
   ]
@@ -64,4 +65,35 @@ ava.cb(t=>{
   }, 'insert to first!')
 
 })
+
+
+ava.only.cb('promise test', t=>{
+  let d=0
+  let man = jobman({
+    max: 1,
+    jobEnd: job=>{
+      console.log(job.prop, 'end')
+      t.is(job.prop, d++)
+    },
+    allEnd: man=>t.end()
+  })
+
+  for(let i=0;i<10;i++){
+    man.add(cb=>{
+      got('baidu.com')
+        .then(response => {
+          cb()
+          // console.log(response.body)
+          //=> '<!doctype html> ...'
+        })
+        .catch(error => {
+          cb(error)
+          // console.log(error.response.body)
+          //=> 'Internal server error ...'
+        })
+    }, i)
+  }
+  man.start()
+})
+
 

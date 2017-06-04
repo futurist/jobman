@@ -4,9 +4,9 @@ function jobman(config) {
   config = config || {}
   config.max = config.max || 3
 
-  let interJob
-  let done = false
-  let run = 0
+  var interJob
+  var done = false
+  var run = 0
 
   const jobs = []
   const man = {
@@ -36,7 +36,7 @@ function jobman(config) {
 
   function start(){
     if(interJob) {
-      console.warn('already started')
+      // console.warn('already started')
       return
     }
     interJob = setInterval(check)
