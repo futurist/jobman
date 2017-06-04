@@ -22,7 +22,6 @@
   },
   "homepage": "https://github.com/futurist/jobman#readme",
   "devDependencies": {
-    "ava": "^0.19.1",
-    "got": "^7.0.0"
+    "ava": "^0.19.1"
   }
 }

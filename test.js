@@ -1,7 +1,6 @@
 
 const ava = require('ava')
 const jobman = require('./')
-const got = require('got')
 
 ava.cb('example test', t=>{
   const testProps = [
@@ -80,17 +79,9 @@ ava.only.cb('promise test', t=>{
 
   for(let i=0;i<10;i++){
     man.add(cb=>{
-      got('baidu.com')
-        .then(response => {
-          cb()
-          // console.log(response.body)
-          //=> '<!doctype html> ...'
-        })
-        .catch(error => {
-          cb(error)
-          // console.log(error.response.body)
-          //=> 'Internal server error ...'
-        })
+      new Promise((res,rej)=>{
+        setTimeout(res, 1000)
+      }).then(cb, cb)
     }, i)
   }
   man.start()
