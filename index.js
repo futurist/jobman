@@ -1,44 +1,5 @@
 
 
-function task(i, done){
-  setTimeout(()=>{
-    console.log('task '+i)
-    done(i==3 ? 'bad' : null)
-  }, 1000)
-}
-
-let man = jobman({
-  allEnd: man=>{
-    console.log('all end', man.allEnd)
-    console.log('all state', man.jobs.map(fn=>fn.state))
-    man.stop()
-  },
-  jobStart: (job, man)=>{
-    if(job.prop==5) return false
-  },
-  jobEnd: (job, man)=>{
-    console.log(job.prop, man.allEnd, man.allEmpty, man.lastError, man.slot)
-    // man.stop()
-  },
-  allEmpty: man=>{
-    console.log('queue become empty', man.allEmpty, man.slot)
-  },
-  autoStart: true
-})
-// man.start()
-
-console.log(man.slot)
-
-for(let i=0;i<10;i++){
-  man.add(cb=>{
-    task(i, cb)
-  }, i)
-}
-
-  man.add(1, cb=>{
-    task(99, cb)
-  }, 'insert to second')
-
 function jobman(config) {
   config = config || {}
   config.max = config.max || 3
@@ -100,9 +61,8 @@ function jobman(config) {
       if(!run && !done) {
         // console.log('all done')
         done = true
-        config.allEnd
-          ? config.allEnd(man)
-          : stop()
+        config.allEnd && config.allEnd(man)
+        stop()
       }
       return
     }
@@ -135,3 +95,7 @@ function jobman(config) {
   return man
 
 }
+
+
+module.exports = jobman
+

@@ -1,0 +1,27 @@
+{
+  "name": "jobman",
+  "version": "1.0.0",
+  "description": "Controllable and resonable job queue manager",
+  "main": "index.js",
+  "scripts": {
+    "test": "ava"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/futurist/jobman.git"
+  },
+  "keywords": [
+    "job",
+    "queue",
+    "concurrence"
+  ],
+  "author": "James Yang <jamesyang999@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/futurist/jobman/issues"
+  },
+  "homepage": "https://github.com/futurist/jobman#readme",
+  "devDependencies": {
+    "ava": "^0.19.1"
+  }
+}
