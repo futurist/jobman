@@ -66,18 +66,23 @@ ava.cb('example test', t=>{
 })
 
 
-ava.only.cb('promise test', t=>{
-  let d=0
-  let man = jobman({
+ava.cb('promise test', t=>{
+  var d=0
+  var endTime=0
+  var man = jobman({
     max: 1,
+    jobStart: job=>{
+      t.is(new Date()>=endTime, true)
+    },
     jobEnd: job=>{
-      console.log(job.prop, 'end')
+      endTime = new Date()
+      console.log(job.prop, job.state, 'end')
       t.is(job.prop, d++)
     },
     allEnd: man=>t.end()
   })
 
-  for(let i=0;i<10;i++){
+  for(let i=0;i<5;i++){
     man.add(cb=>{
       new Promise((res,rej)=>{
         setTimeout(res, 1000)
@@ -87,4 +92,40 @@ ava.only.cb('promise test', t=>{
   man.start()
 })
 
+ava.cb('timeout', t=>{
+  var endTime=0
+  var timeoutID = [3,4]
+  var endID = [0,1,2,5]
+  let man = jobman({
+    max: 1,
+    timeout: 1000,
+    jobTimeout: job=>{
+      endTime = new Date()
+      t.is(job.prop.id, timeoutID.shift())
+      console.log(new Date(), job.prop, 'timeout')
+    },
+    jobStart: job=>{
+      t.is(new Date()>=endTime, true)
+      // console.log(new Date())
+    },
+    jobEnd: job=>{
+      endTime = new Date()
+      t.is(job.prop.id, endID.shift())
+      console.log(new Date, job.prop, job.state, 'end')
+    },
+    allEnd: man=>t.end()
+  })
 
+  for(let i=0;i<5;i++){
+    let timeout = i*400
+    man.add(cb=>{
+      setTimeout(cb, timeout)
+    }, {id: i})
+  }
+  man.start()
+
+  man.add(cb=>{
+    setTimeout(cb, 2000)
+  }, {timeout: 3000, id: 5})
+  
+})

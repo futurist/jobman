@@ -1,4 +1,7 @@
 
+function isObject(obj) {
+  return obj !== null && typeof obj === 'object'
+}
 
 function jobman(config) {
   config = config || {}
@@ -48,8 +51,20 @@ function jobman(config) {
     interJob=null
   }
   
-  function pendingJob (f) {
-    return f.state===undefined
+  function pendingJob (fn) {
+    return fn.state===undefined
+  }
+
+  function timeout(fn) {
+    const ms = isObject(fn.prop) && fn.prop.timeout || config.timeout
+    if(!ms) return
+    fn._tID = setTimeout(function(){
+      if(config.jobTimeout && config.jobTimeout(fn, man)===false){
+        return timeout(fn)
+      }
+      run--
+      fn.state = 'timeout'
+    }, ms)
   }
 
   function check(){
@@ -75,12 +90,17 @@ function jobman(config) {
     done = false
     fn.state='run'
     fn(function next(err){
+      if(fn.state==='timeout') return
+      if(fn._tID) clearTimeout(fn._tID)
       if(err!=null) fn.state = 'error'
       else fn.state = 'done'
       run--
       man.lastError = err
       config.jobEnd && config.jobEnd(fn, man)
     })
+    
+    timeout(fn)
+
     run++
 
     if(pending.length===1) {
@@ -98,4 +118,3 @@ function jobman(config) {
 
 
 module.exports = jobman
-
