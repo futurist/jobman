@@ -17,7 +17,7 @@ let man = jobman({
     if(job.prop==5) return false
   },
   jobEnd: (job, man)=>{
-    console.log(man.allEnd, man.allEmpty, man.lastError, man.slot)
+    console.log(job.prop, man.allEnd, man.allEmpty, man.lastError, man.slot)
     // man.stop()
   },
   allEmpty: man=>{
@@ -35,6 +35,9 @@ for(let i=0;i<10;i++){
   }, i)
 }
 
+  man.add(1, cb=>{
+    task(99, cb)
+  }, 'insert to second')
 
 function jobman(config) {
   config = config || {}
@@ -48,8 +51,13 @@ function jobman(config) {
   const man = {
     config: config,
     jobs: jobs,
-    add: function (fn, prop) {
-      jobs.push(fn)
+    add: function (pos, fn, prop) {
+      if(typeof pos=='function') {
+        prop = fn, fn = pos
+        jobs.push(fn)
+      } else {
+        jobs.splice(pos, 0, fn)
+      }
       fn.prop = prop
     },
     get allEnd () {
