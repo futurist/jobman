@@ -14,14 +14,12 @@ The example code:
 ```javascript
 const jobman = require('jobman')
 
+// dummy task function
 function task(i, done){
   setTimeout(()=>{
-    console.log('task '+i)
-
     // done with error
     if(i==3) done('bad')
     else done()
-
   }, 1000)
 }
 
@@ -29,13 +27,16 @@ let man = jobman({
   max: 3,
   allEnd: man=>{
     console.log('all end', man.allEnd)
-    man.stop()
   },
   jobStart: (job, man)=>{
     if(job.prop==5) return false
   },
   jobEnd: (job, man)=>{
-    console.log('result: ', job.prop, man.lastError)
+    console.log('result: ', job.prop, man.lastError || 'ok')
+    // man.stop()
+  },
+  jobTimeout: (job, man)=>{
+    console.log('timeout: ', job.prop)
     // man.stop()
   },
   allEmpty: man=>{
@@ -52,45 +53,24 @@ for(let i=0;i<10;i++){
 
 man.add(0, cb=>{
   task(99, cb)
-}, 'insert to first!')
+}, {id: 'insert to first!', timeout: 500})
 ```
 
 The result:
 
 ```
-task 99
-result:  insert to first! null
-task 0
-result:  0 null
-task 1
-result:  1 null
-task 2
-result:  2 null
-task 3
+timeout:  { id: 'insert to first!', timeout: 500 }
+result:  0 ok
+result:  1 ok
+result:  2 ok
 result:  3 bad
-task 4
-result:  4 null
-task 6
-result:  6 null
-task 7
-result:  7 null
+result:  4 ok
+result:  6 ok
 queue become empty true
-task 8
-result:  8 null
-task 9
-result:  9 null
+result:  7 ok
+result:  8 ok
+result:  9 ok
 all end true
-all state [ 'done',
-  'done',
-  'done',
-  'done',
-  'error',
-  'done',
-  'cancel',
-  'done',
-  'done',
-  'done',
-  'done' ]
 ```
 
 ## API
@@ -100,6 +80,10 @@ all state [ 'done',
 - *config*
   - config.max *int*
     > **max number of concurrence jobs.**
+  - config.timeout *int*
+    > **ms to wait for --A job--, trigger jobTimeout event after the time**
+  - config.jobTimeout *fn(job, man)->boolean*
+    > **callback function after --A job-- timeout, return false will book another timeout**
   - config.jobStart *fn(job, man)->boolean*
     > **callback function before --A job-- will start, return false will cancel this job**
   - config.jobEnd *fn(job, man)->void*
@@ -116,20 +100,22 @@ all state [ 'done',
     > **function to stop current jobman**
   - man.start()
     > **function to start current jobman**
-  - man.config
+  - man.config *object*
     > **the config object passed into jobman**
-  - man.jobs
+  - man.jobs *array*
     > **the jobs array internally, query for it for state, length etc.**
-  - man.allEnd
+  - man.allEnd *boolean*
     > **prop to get if all job ended**
-  - man.allEmpty
+  - man.allEmpty *boolean*
     > **prop to get if queue is empty**
-  - man.slot
+  - man.slot *int*
     > **prop to get current available job runner slot**
-  - man.lastError
+  - man.lastError *any*
     > **will set to the job error object after each end of job callback**
 
 - *jobObject*
-  - job.prop
+  - job.prop *any*
     > **the prop to passed with man.add()**
+  - job.prop.timeout *int*
+    > **set timeout for individual job**
 

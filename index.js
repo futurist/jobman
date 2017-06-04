@@ -118,3 +118,48 @@ function jobman(config) {
 
 
 module.exports = jobman
+
+
+
+function task(i, done){
+  setTimeout(()=>{
+
+    // done with error
+    if(i==3) done('bad')
+    else done()
+
+  }, 1000)
+}
+
+let man = jobman({
+  max: 3,
+  allEnd: man=>{
+    console.log('all end', man.allEnd)
+    man.stop()
+  },
+  jobStart: (job, man)=>{
+    if(job.prop==5) return false
+  },
+  jobEnd: (job, man)=>{
+    console.log('result: ', job.prop, man.lastError || 'ok')
+    // man.stop()
+  },
+  jobTimeout: (job, man)=>{
+    console.log('timeout: ', job.prop)
+    // man.stop()
+  },
+  allEmpty: man=>{
+    console.log('queue become empty', man.allEmpty)
+  },
+  autoStart: true
+})
+
+for(let i=0;i<10;i++){
+  man.add(cb=>{
+    task(i, cb)
+  }, i)
+}
+
+man.add(0, cb=>{
+  task(99, cb)
+}, {id: 'insert to first!', timeout: 500})
