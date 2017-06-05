@@ -3,8 +3,6 @@ language: node_js
 node_js:
   - '7'
 
-script: npm run cover
-
-after_success: npm run coveralls
+script: npm run coveralls
 
 
