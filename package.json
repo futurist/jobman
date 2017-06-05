@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "ava",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "cover": "nyc --reporter=lcov npm test"
   },
   "repository": {
@@ -23,6 +24,8 @@
   },
   "homepage": "https://github.com/futurist/jobman#readme",
   "devDependencies": {
-    "ava": "^0.19.1"
+    "ava": "^0.19.1",
+    "coveralls": "^2.13.1",
+    "nyc": "^11.0.2"
   }
 }

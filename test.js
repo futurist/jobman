@@ -191,20 +191,24 @@ ava('start again', t=>{
   man.stop()
 })
 
-// ava('get/set config', t=>{
-//   var man = jobman({max: 1})
-//   man.start()
+ava.cb('get/set config', t=>{
+  var man = jobman({
+    max: 1,
+    jobStart: job=>{
+      t.is(man.config.jobRun, undefined)
+      t.is(man.slot, 1)
+      man.config = {
+        max:2,
+        jobRun: job=>{
+          t.is(man.config.jobStart, undefined)
+          t.is(man.slot, 1)
+        },
+        allEnd: man=>t.end()
+      }
+    }
+  })
 
-//   man.add(cb=>setTimeout(cb, 100))
-//   t.is(man.slot, 0)
-//   t.is(man.config.max, 1)
-
-//   man.config = {max: 2}
-//   t.is(man.config.max, 2)
-//   t.is(man.slot, 1)
-  
-//   man.add(cb=>setTimeout(cb, 100))
-//   t.is(man.slot, 0)
-
-// })
+  man.add(cb=>setTimeout(cb, 100))
+  man.start()
+})
 
