@@ -14,46 +14,42 @@ The example code:
 ```javascript
 const jobman = require('jobman')
 
-// dummy task function
-function task(i, done){
+function task(i, done){  // dummy task function
   setTimeout(()=>{
-    // done with error
-    if(i==3) done('bad')
-    else done()
-  }, 1000)
+    if(i==3) done('bad')  // done with error
+    else done()  // done with ok
+  }, 1000)  // async happen at 1 second
 }
 
-let man = jobman({
-  max: 3,
-  allEnd: man=>{
-    console.log('all end', man.allEnd)
+let man = jobman({  // create new jobman object
+  max: 3,  // max concurrent jobs
+  jobStart: (job, man)=>{  // when A job will start
+    if(job.prop==5) return false  // return FALSE will cancel the job
   },
-  jobStart: (job, man)=>{
-    if(job.prop==5) return false
-  },
-  jobEnd: (job, man)=>{
+  jobEnd: (job, man)=>{  // when A job did end
     console.log('result: ', job.prop, man.lastError || 'ok')
-    // man.stop()
   },
-  jobTimeout: (job, man)=>{
+  jobTimeout: (job, man)=>{  // when A job timeout
     console.log('timeout: ', job.prop)
-    // man.stop()
   },
-  allEmpty: man=>{
+  allEmpty: man=>{  // when all jobs distributed, queue empty
     console.log('queue become empty', man.allEmpty)
   },
-  autoStart: true
+  allEnd: man=>{  // all jobs done
+    console.log('all end', man.allEnd)
+  },
+  autoStart: true  // start monitor when create
 })
 
 for(let i=0;i<10;i++){
-  man.add(cb=>{
+  man.add(cb=>{  // add A job
     task(i, cb)
-  }, i)
+  }, i)  // job.prop = i
 }
 
-man.add(0, cb=>{
+man.add(0, cb=>{  // insert A job into 0 index
   task(99, cb)
-}, {id: 'insert to first!', timeout: 500})
+}, {id: 'insert to first!', timeout: 500})  // the job timeout is 500ms
 ```
 
 The result:
