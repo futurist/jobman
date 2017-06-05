@@ -2,6 +2,8 @@
 Controllable and resonable job queue manager
 
 [![Build Status](https://travis-ci.org/futurist/jobman.svg?branch=master)](https://travis-ci.org/futurist/jobman)
+[![Coverage Status](https://coveralls.io/repos/github/futurist/jobman/badge.svg?branch=master)](https://coveralls.io/github/futurist/jobman?branch=master)
+[![npm](https://img.shields.io/npm/v/jobman.svg "Version")](https://www.npmjs.com/package/jobman)
 
 ## Install
 
