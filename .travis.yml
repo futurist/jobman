@@ -1,7 +1,7 @@
 language: node_js
 
 node_js:
-  - 'latest'
+  - '7'
 
 script: 'npm test'
 
