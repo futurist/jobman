@@ -34,9 +34,6 @@ let man = jobman({  // create new jobman object
   jobTimeout: (job, man)=>{  // when A job timeout
     console.log('timeout: ', job.prop)
   },
-  allEmpty: man=>{  // when all jobs distributed, queue empty
-    console.log('queue become empty', man.pending.length)
-  },
   allEnd: man=>{  // all jobs done
     console.log('all end', man.end)
   },
@@ -64,7 +61,6 @@ result:  2 ok
 result:  3 bad
 result:  4 ok
 result:  6 ok
-queue become empty 0
 result:  7 ok
 result:  8 ok
 result:  9 ok
@@ -84,10 +80,10 @@ all end true
     > **callback function after --A job-- timeout, return false will book another timeout**
   - config.jobStart *fn(job, man)->boolean*
     > **callback function before --A job-- will start, return false will cancel this job**
+  - config.jobRun *fn(job, man)->void*
+    > **callback function after --A job-- did start, job.state become run**
   - config.jobEnd *fn(job, man)->void*
     > **callback function after --A job-- callback invoked, with man.lastError set to result error**
-  - config.allEmpty *fn(man)->void*
-    > **callback function when no more job in the queue, but some job may still running**
   - config.allEnd *fn(man)->void*
     > **callback function when --ALL job-- finished run**
 
@@ -106,7 +102,7 @@ all end true
     > **prop to get if the job monitor is running (no man.stop())**
   - man.end *boolean*
     > **prop to get if all job ended**
-  - man.pending *[fn, ...]*
+  - man.queue *[fn, ...]*
     > **prop to get pending jobs in queue**
   - man.slot *int*
     > **prop to get current available job runner slot**

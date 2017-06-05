@@ -35,7 +35,7 @@ function jobman(config) {
     get running () {
       return interJob != null
     },
-    get pending (){
+    get queue (){
       return jobs.filter(pendingJob)
     },
     get slot(){
@@ -77,8 +77,14 @@ function jobman(config) {
 
   function check(){
     if(run>=config.max) return
-    const pending = jobs.filter(pendingJob)
-    const fn = pending[0]
+
+    /* var fn = jobs.find(pendingJob) */
+    for (let i = 0; i < jobs.length; i++) {
+      if(pendingJob(jobs[i])) {
+        var fn = jobs[i]
+        break
+      }
+    }
 
     if(!fn) {
       if(!run && !done) {
@@ -111,10 +117,7 @@ function jobman(config) {
 
     run++
 
-    if(pending.length===1) {
-      // console.log('queue become empty')
-      config.allEmpty && config.allEmpty(man)
-    }
+    config.jobRun && config.jobRun(fn, man)
 
   }
 

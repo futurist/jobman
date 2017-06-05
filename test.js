@@ -47,6 +47,7 @@ ava.cb('example test', t=>{
       // console.log('all end', man.end)
       // console.log('all state', man.jobs.map(fn=>fn.state))
       t.is(man.end, true)
+      t.is(man.queue.length, 0)
       t.deepEqual(man.jobs.map(fn=>fn.state), 
         [ 'done',
         'done',
@@ -64,17 +65,15 @@ ava.cb('example test', t=>{
     jobStart: (job, man)=>{
       if(job.prop==5) return false
     },
+    jobRun: (job, man)=>{
+      t.is(job.state, 'run')
+      t.is(man.running, true)
+    },
     jobEnd: (job, man)=>{
-      // console.log(job.prop, man.end, man.pending, man.lastError, man.slot)
+      // console.log(job.prop, man.end, man.queue, man.lastError, man.slot)
       t.is(job.prop, testProps.shift())
       t.is(man.end, false)
       if(job.prop==3) t.is(man.lastError, 'bad')
-    },
-    allEmpty: man=>{
-      // console.log('queue become empty', man.pending, man.slot)
-      t.is(man.pending.length, 0)
-      t.is(man.slot, 0)
-      t.is(man.running, true)
     },
     autoStart: true
   })
@@ -191,10 +190,20 @@ ava('start again', t=>{
   man.stop()
 })
 
-ava('start again', t=>{
-  var man = jobman()
-  man.start()
-  t.is(man.start(), false)
-  man.stop()
-})
+// ava('get/set config', t=>{
+//   var man = jobman({max: 1})
+//   man.start()
+
+//   man.add(cb=>setTimeout(cb, 100))
+//   t.is(man.slot, 0)
+//   t.is(man.config.max, 1)
+
+//   man.config = {max: 2}
+//   t.is(man.config.max, 2)
+//   t.is(man.slot, 1)
+  
+//   man.add(cb=>setTimeout(cb, 100))
+//   t.is(man.slot, 0)
+
+// })
 
