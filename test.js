@@ -68,6 +68,7 @@ ava.cb('example test', t=>{
     jobRun: (job, man)=>{
       t.is(job.state, 'run')
       t.is(man.running, true)
+      if(man.queue.length==0) console.log('queue empty')
     },
     jobEnd: (job, man)=>{
       // console.log(job.prop, man.end, man.queue, man.lastError, man.slot)
