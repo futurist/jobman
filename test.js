@@ -2,6 +2,34 @@
 const ava = require('ava')
 const jobman = require('./')
 
+ava.cb('end test', t=>{
+  var d = jobman({
+    allEnd: man=>{
+      // console.log('all end', man.jobs)
+      t.deepEqual(man.jobs, [])
+      t.deepEqual(man.end, true)
+      t.end()
+    }
+  })
+  // console.log(d.running, d.end)
+  t.is(d.running, false)
+  t.is(d.end, true)
+  d.start()
+  // console.log(d.running, d.end)
+  t.is(d.running, true)
+  t.is(d.end, true)
+
+  d.add(cb=>setTimeout(cb, 1000))
+  d.add(cb=>setTimeout(cb, 1000))
+  d.add(cb=>setTimeout(cb, 1000))
+
+  t.is(d.running, true)
+  t.is(d.end, false)
+
+  d.jobs.splice(0,3)
+
+})
+
 ava.cb('example test', t=>{
   const testProps = [
     'insert to first!', 0,1,2,3,4,6,7,8,9

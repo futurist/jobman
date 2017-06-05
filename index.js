@@ -8,7 +8,7 @@ function jobman(config) {
   config.max = config.max || 3
 
   var interJob
-  var done = false
+  var done = true
   var run = 0
 
   const jobs = []
@@ -21,6 +21,10 @@ function jobman(config) {
         jobs.splice(pos, 0, fn)
       }
       fn.prop = prop
+      delete fn.state
+
+      // if(interJob) check()
+      done = false
     },
     get config (){ return config },
     set config (val){ config = val },
@@ -56,7 +60,7 @@ function jobman(config) {
   }
   
   function pendingJob (fn) {
-    return fn.state===undefined
+    return !fn.hasOwnProperty('state')
   }
 
   function timeout(fn) {
@@ -72,7 +76,7 @@ function jobman(config) {
   }
 
   function check(){
-    if(jobs.length===0 || run>=config.max) return
+    if(run>=config.max) return
     const pending = jobs.filter(pendingJob)
     const fn = pending[0]
 
