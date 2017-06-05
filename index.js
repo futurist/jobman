@@ -13,8 +13,6 @@ function jobman(config) {
 
   const jobs = []
   const man = {
-    config: config,
-    jobs: jobs,
     add: function (pos, fn, prop) {
       if(typeof pos=='function') {
         prop = fn, fn = pos
@@ -24,6 +22,9 @@ function jobman(config) {
       }
       fn.prop = prop
     },
+    get config (){ return config },
+    set config (val){ config = val },
+    get jobs (){ return jobs },
     get end () {
       return done
     },
