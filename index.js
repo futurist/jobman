@@ -24,11 +24,14 @@ function jobman(config) {
       }
       fn.prop = prop
     },
-    get allEnd () {
+    get end () {
       return done
     },
-    get allEmpty (){
-      return !jobs.some(pendingJob)
+    get running () {
+      return interJob != null
+    },
+    get pending (){
+      return jobs.filter(pendingJob)
     },
     get slot(){
       return config.max - run

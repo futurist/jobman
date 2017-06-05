@@ -16,9 +16,9 @@ ava.cb('example test', t=>{
   let man = jobman({
     max: 3,
     allEnd: man=>{
-      // console.log('all end', man.allEnd)
+      // console.log('all end', man.end)
       // console.log('all state', man.jobs.map(fn=>fn.state))
-      t.is(man.allEnd, true)
+      t.is(man.end, true)
       t.deepEqual(man.jobs.map(fn=>fn.state), 
         [ 'done',
         'done',
@@ -37,15 +37,16 @@ ava.cb('example test', t=>{
       if(job.prop==5) return false
     },
     jobEnd: (job, man)=>{
-      // console.log(job.prop, man.allEnd, man.allEmpty, man.lastError, man.slot)
+      // console.log(job.prop, man.end, man.pending, man.lastError, man.slot)
       t.is(job.prop, testProps.shift())
-      t.is(man.allEnd, false)
+      t.is(man.end, false)
       if(job.prop==3) t.is(man.lastError, 'bad')
     },
     allEmpty: man=>{
-      // console.log('queue become empty', man.allEmpty, man.slot)
-      t.is(man.allEmpty, true)
+      // console.log('queue become empty', man.pending, man.slot)
+      t.is(man.pending.length, 0)
       t.is(man.slot, 0)
+      t.is(man.running, true)
     },
     autoStart: true
   })

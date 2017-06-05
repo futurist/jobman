@@ -35,10 +35,10 @@ let man = jobman({  // create new jobman object
     console.log('timeout: ', job.prop)
   },
   allEmpty: man=>{  // when all jobs distributed, queue empty
-    console.log('queue become empty', man.allEmpty)
+    console.log('queue become empty', man.pending.length)
   },
   allEnd: man=>{  // all jobs done
-    console.log('all end', man.allEnd)
+    console.log('all end', man.end)
   },
   autoStart: true  // start monitor when create
 })
@@ -64,7 +64,7 @@ result:  2 ok
 result:  3 bad
 result:  4 ok
 result:  6 ok
-queue become empty true
+queue become empty 0
 result:  7 ok
 result:  8 ok
 result:  9 ok
@@ -95,17 +95,19 @@ all end true
   - man.add([position:int], jobFn:cb=>{}, jobProp:any)
     > **jobFn is with callback for one job, cb(err) have to be called for each job. jobProp will become job.prop**
   - man.stop()
-    > **function to stop current jobman**
+    > **function to stop current jobman, use man.start to start again**
   - man.start()
-    > **function to start current jobman**
+    > **function to start current jobman, use man.stop to stop it**
   - man.config *object*
     > **the config object passed into jobman**
   - man.jobs *array*
     > **the jobs array internally, query for it for state, length etc.**
-  - man.allEnd *boolean*
+  - man.running *boolean*
+    > **prop to get if the job monitor is running (no man.stop())**
+  - man.end *boolean*
     > **prop to get if all job ended**
-  - man.allEmpty *boolean*
-    > **prop to get if queue is empty**
+  - man.pending *[fn, ...]*
+    > **prop to get pending jobs in queue**
   - man.slot *int*
     > **prop to get current available job runner slot**
   - man.lastError *any*
