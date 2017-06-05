@@ -1,6 +1,8 @@
 # jobman
 Controllable and resonable job queue manager
 
+[![Build Status](https://travis-ci.org/futurist/jobman.svg?branch=master)](https://travis-ci.org/futurist/jobman)
+
 ## Install
 
 ```

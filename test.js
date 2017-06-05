@@ -129,3 +129,43 @@ ava.cb('timeout', t=>{
   }, {timeout: 3000, id: 5})
   
 })
+
+
+ava.cb('timeout renew', t=>{
+  var count=0
+  let man = jobman({
+    timeout: 100,
+    jobEnd: job=>{
+      // console.log(job, 'end')
+      t.is(count, 9)
+    },
+    jobTimeout: job=>{
+      // console.log(job, 'renew')
+      ++count
+      return false
+    },
+    allEnd: man=>t.end()
+  })
+  man.start()
+
+  man.add(cb=>{
+    setTimeout(cb, 950)
+  })
+  
+})
+
+
+ava('start again', t=>{
+  var man = jobman()
+  man.start()
+  t.is(man.start(), false)
+  man.stop()
+})
+
+ava('start again', t=>{
+  var man = jobman()
+  man.start()
+  t.is(man.start(), false)
+  man.stop()
+})
+

@@ -4,7 +4,8 @@
   "description": "Controllable and resonable job queue manager",
   "main": "index.js",
   "scripts": {
-    "test": "ava"
+    "test": "ava",
+    "cover": "nyc --reporter=lcov npm test"
   },
   "repository": {
     "type": "git",
