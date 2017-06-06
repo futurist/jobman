@@ -37,7 +37,7 @@ let man = jobman({  // create new jobman object
     console.log('timeout: ', job.prop)
   },
   allEnd: man=>{  // all jobs done
-    console.log('all end', man.end)
+    console.log('all end', man.done)
   },
   autoStart: true  // start monitor when create
 })
@@ -114,6 +114,8 @@ all end true
     > **prop to get current available job runner slot**
   - man.lastError *any*
     > **will set to the job error object after each end of job callback**
+  - man.reason *any*
+    > **reason to end jobman by user**
 
 - *jobObject*
   - job.fn *function*
