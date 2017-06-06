@@ -23,7 +23,8 @@ function jobman(config) {
       // if(interJob) check()
       done = false
     },
-    end: function() {
+    end: function(reason) {
+      man.reason = reason || ''
       jobs.splice(0, jobs.length)
       run=0
       check()
@@ -34,11 +35,14 @@ function jobman(config) {
     get done () {
       return done
     },
-    get running () {
-      return interJob != null
+    get stopped () {
+      return interJob == null
     },
-    get queue (){
+    get pending (){
       return jobs.filter(pendingJob)
+    },
+    get running (){
+      return jobs.filter(runningJob)
     },
     get slot(){
       return config.max - run
@@ -65,6 +69,10 @@ function jobman(config) {
     return !jobObj.hasOwnProperty('state')
   }
 
+  function runningJob (jobObj) {
+    return jobObj.state === 'run'
+  }
+
   function timeout(jobObj) {
     const ms = isObject(jobObj.prop) && jobObj.prop.timeout || config.timeout
     if(!ms) return
@@ -77,7 +85,7 @@ function jobman(config) {
     }, ms)
   }
 
-  function check(){
+  function check() {
     if(run>=config.max) return
 
     /* var jobObj = jobs.find(pendingJob) */

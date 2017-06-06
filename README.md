@@ -92,6 +92,8 @@ all end true
 - *manObject*
   - man.add([position:int], jobFn:cb=>{}, jobProp:any)
     > **jobFn is with callback for one job, cb(err) have to be called for each job. jobProp will become job.prop**
+  - man.end([reason])
+    > **Remove all jobs with reason, maybe trigger man.allEnd if there're jobs running.**
   - man.stop()
     > **function to stop current jobman, use man.start to start again**
   - man.start()
@@ -100,12 +102,14 @@ all end true
     > **the config object passed into jobman**
   - man.jobs *array*
     > **the jobs array internally, query for it for state, length etc.**
-  - man.running *boolean*
-    > **prop to get if the job monitor is running (no man.stop())**
-  - man.end *boolean*
+  - man.stopped *boolean*
+    > **prop to get if the job monitor is stopped (not running)**
+  - man.done *boolean*
     > **prop to get if all job ended**
-  - man.queue *[jobObject, ...]*
+  - man.pending *[jobObject, ...]*
     > **prop to get pending jobs in queue**
+  - man.running *[jobObject, ...]*
+    > **prop to get running jobs in process**
   - man.slot *int*
     > **prop to get current available job runner slot**
   - man.lastError *any*
