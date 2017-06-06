@@ -7,24 +7,24 @@ ava.cb('end test', t=>{
     allEnd: man=>{
       // console.log('all end', man.jobs)
       t.deepEqual(man.jobs, [])
-      t.deepEqual(man.end, true)
+      t.deepEqual(man.done, true)
       t.end()
     }
   })
-  // console.log(d.running, d.end)
+  // console.log(d.running, d.done)
   t.is(d.running, false)
-  t.is(d.end, true)
+  t.is(d.done, true)
   d.start()
-  // console.log(d.running, d.end)
+  // console.log(d.running, d.done)
   t.is(d.running, true)
-  t.is(d.end, true)
+  t.is(d.done, true)
 
   d.add(cb=>setTimeout(cb, 1000))
   d.add(cb=>setTimeout(cb, 1000))
   d.add(cb=>setTimeout(cb, 1000))
 
   t.is(d.running, true)
-  t.is(d.end, false)
+  t.is(d.done, false)
 
   d.jobs.splice(0,3)
 
@@ -44,9 +44,9 @@ ava.cb('example test', t=>{
   let man = jobman({
     max: 3,
     allEnd: man=>{
-      // console.log('all end', man.end)
+      // console.log('all end', man.done)
       // console.log('all state', man.jobs.map(fn=>fn.state))
-      t.is(man.end, true)
+      t.is(man.done, true)
       t.is(man.queue.length, 0)
       t.deepEqual(man.jobs.map(fn=>fn.state), 
         [ 'done',
@@ -71,9 +71,9 @@ ava.cb('example test', t=>{
       if(man.queue.length==0) console.log('queue empty')
     },
     jobEnd: (job, man)=>{
-      // console.log(job.prop, man.end, man.queue, man.lastError, man.slot)
+      // console.log(job.prop, man.done, man.queue, man.lastError, man.slot)
       t.is(job.prop, testProps.shift())
-      t.is(man.end, false)
+      t.is(man.done, false)
       if(job.prop==3) t.is(man.lastError, 'bad')
     },
     autoStart: true
@@ -212,3 +212,30 @@ ava.cb('get/set config', t=>{
   man.start()
 })
 
+ava.cb('man.end', t=>{
+  var count=0
+  var man = jobman({
+    max: 1,
+    allEnd: man=>{
+      count++
+    }
+  })
+  
+  man.end()
+  t.is(count, 0)
+
+  man.add(cb=>setTimeout(cb,100))
+  man.add(cb=>setTimeout(cb,200))
+  man.add(cb=>setTimeout(cb,300))
+  man.start()
+
+
+  setTimeout(()=>{
+    man.end()
+    t.is(count, 1)
+    t.is(man.done, true)
+    t.deepEqual(man.jobs, [])
+    t.deepEqual(man.queue, [])
+    t.end()
+  }, 150)
+})

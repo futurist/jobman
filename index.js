@@ -16,20 +16,22 @@ function jobman(config) {
     add: function (pos, fn, prop) {
       if(typeof pos=='function') {
         prop = fn, fn = pos
-        jobs.push(fn)
+        jobs.push({fn: fn, prop: prop})
       } else {
-        jobs.splice(pos, 0, fn)
+        jobs.splice(pos, 0, {fn: fn, prop: prop})
       }
-      fn.prop = prop
-      delete fn.state
-
       // if(interJob) check()
       done = false
+    },
+    end: function() {
+      jobs.splice(0, jobs.length)
+      run=0
+      check()
     },
     get config (){ return config },
     set config (val){ config = val },
     get jobs (){ return jobs },
-    get end () {
+    get done () {
       return done
     },
     get running () {
@@ -59,34 +61,34 @@ function jobman(config) {
     interJob=null
   }
   
-  function pendingJob (fn) {
-    return !fn.hasOwnProperty('state')
+  function pendingJob (jobObj) {
+    return !jobObj.hasOwnProperty('state')
   }
 
-  function timeout(fn) {
-    const ms = isObject(fn.prop) && fn.prop.timeout || config.timeout
+  function timeout(jobObj) {
+    const ms = isObject(jobObj.prop) && jobObj.prop.timeout || config.timeout
     if(!ms) return
-    fn._tID = setTimeout(function(){
-      if(config.jobTimeout && config.jobTimeout(fn, man)===false){
-        return timeout(fn)
+    jobObj._tID = setTimeout(function(){
+      if(config.jobTimeout && config.jobTimeout(jobObj, man)===false){
+        return timeout(jobObj)
       }
       run--
-      fn.state = 'timeout'
+      jobObj.state = 'timeout'
     }, ms)
   }
 
   function check(){
     if(run>=config.max) return
 
-    /* var fn = jobs.find(pendingJob) */
+    /* var jobObj = jobs.find(pendingJob) */
     for (let i = 0; i < jobs.length; i++) {
       if(pendingJob(jobs[i])) {
-        var fn = jobs[i]
+        var jobObj = jobs[i]
         break
       }
     }
 
-    if(!fn) {
+    if(!jobObj) {
       if(!run && !done) {
         // console.log('all done')
         done = true
@@ -96,28 +98,28 @@ function jobman(config) {
       return
     }
 
-    if(config.jobStart && config.jobStart(fn, man)===false) {
-      fn.state = 'cancel'
+    if(config.jobStart && config.jobStart(jobObj, man)===false) {
+      jobObj.state = 'cancel'
       return
     }
 
     done = false
-    fn.state='run'
-    fn(function next(err){
-      if(fn.state==='timeout') return
-      if(fn._tID) clearTimeout(fn._tID)
-      if(err!=null) fn.state = 'error'
-      else fn.state = 'done'
+    jobObj.state='run'
+    jobObj.fn(function next(err){
+      if(jobObj.state==='timeout') return
+      if(jobObj._tID) clearTimeout(jobObj._tID)
+      if(err!=null) jobObj.state = 'error'
+      else jobObj.state = 'done'
       run--
       man.lastError = err
-      config.jobEnd && config.jobEnd(fn, man)
+      config.jobEnd && config.jobEnd(jobObj, man)
     })
     
-    timeout(fn)
+    timeout(jobObj)
 
     run++
 
-    config.jobRun && config.jobRun(fn, man)
+    config.jobRun && config.jobRun(jobObj, man)
 
   }
 

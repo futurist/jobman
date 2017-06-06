@@ -104,7 +104,7 @@ all end true
     > **prop to get if the job monitor is running (no man.stop())**
   - man.end *boolean*
     > **prop to get if all job ended**
-  - man.queue *[fn, ...]*
+  - man.queue *[jobObject, ...]*
     > **prop to get pending jobs in queue**
   - man.slot *int*
     > **prop to get current available job runner slot**
@@ -112,8 +112,12 @@ all end true
     > **will set to the job error object after each end of job callback**
 
 - *jobObject*
+  - job.fn *function*
+    > **the jobFn function passed into man.add()**
   - job.prop *any*
-    > **the prop to passed with man.add()**
+    > **the prop to passed into man.add()**
   - job.prop.timeout *int*
     > **set timeout for individual job**
+  - job.state *any*
+    > **internal state for each job, value is run/done/error/timeout/cancel**
 
