@@ -18,14 +18,7 @@ The example code:
 ```javascript
 const jobman = require('jobman')
 
-function task(i, done){  // dummy task function
-  setTimeout(()=>{
-    if(i==3) done('bad')  // done with error
-    else done()  // done with ok
-  }, 1000)  // async happen at 1 second
-}
-
-let man = jobman({  // create new jobman object
+const man = jobman({  // create new jobman object
   max: 3,  // max concurrent jobs
   jobStart: (job, man)=>{  // when A job will start
     if(job.prop==5) return false  // return FALSE will cancel the job
@@ -38,6 +31,7 @@ let man = jobman({  // create new jobman object
   },
   allEnd: man=>{  // all jobs done
     console.log('all end', man.done)
+    man.end()  // release all job memory
   },
   autoStart: true  // start monitor when create
 })
@@ -51,6 +45,14 @@ for(let i=0;i<10;i++){
 man.add(0, cb=>{  // insert A job into 0 index
   task(99, cb)
 }, {id: 'insert to first!', timeout: 500})  // the job timeout is 500ms
+
+function task(i, done){  // dummy task function
+  setTimeout(()=>{
+    if(i==3) done('bad')  // done with error
+    else done()  // done with ok
+  }, 1000)  // async happen at 1 second
+}
+
 ```
 
 The result:
@@ -93,7 +95,7 @@ all end true
   - man.add([position:int], jobFn:cb=>{}, jobProp:any)
     > **jobFn is with callback for one job, cb(err) have to be called for each job. jobProp will become job.prop**
   - man.end([reason])
-    > **Remove all jobs with reason, maybe trigger man.allEnd if there're jobs running.**
+    > **Remove all jobs with reason, release memory, maybe trigger man.allEnd if there're jobs running.**
   - man.stop()
     > **function to stop current jobman, use man.start to start again**
   - man.start()
