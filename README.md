@@ -95,7 +95,7 @@ all end true
   - man.add([position:int], jobFn:cb=>{}, jobProp:any)
     > **jobFn is with callback for one job, cb(err) have to be called for each job. jobProp will become job.prop**
   - man.end([reason])
-    > **Remove all jobs with reason, release memory, will always trigger man.allEnd with man.reason set to reason.**
+    > **Remove all jobs with reason, will release memory, cancel running jobs, trigger man.allEnd with man.reason set to reason.**
   - man.stop()
     > **function to stop current jobman, use man.start to start again**
   - man.start()
