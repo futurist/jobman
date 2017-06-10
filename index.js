@@ -28,6 +28,7 @@ function jobman(config) {
       man.running.forEach(function(job){
         job.state = 'cancel'
       })
+      run = 0
       jobs.splice(0, jobs.length)
     },
     get config (){ return config },
