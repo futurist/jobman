@@ -218,12 +218,12 @@ ava.cb('man.end', t=>{
     max: 1,
     allEnd: man=>{
       count++
-      t.is('reason' in man, true)
+      if(count==1) t.is('reason' in man, true)
     }
   })
   
   man.end()
-  t.is(count, 0)
+  t.is(count, 1)
 
   man.add(cb=>setTimeout(cb,100))
   man.add(cb=>setTimeout(cb,200))
@@ -234,7 +234,7 @@ ava.cb('man.end', t=>{
   setTimeout(()=>{
     t.is(man.running.length, 1)
     man.end()
-    t.is(count, 1)
+    t.is(count, 2)
     t.is(man.done, true)
     t.deepEqual(man.jobs, [])
     t.deepEqual(man.pending, [])

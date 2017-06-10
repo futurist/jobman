@@ -24,10 +24,11 @@ function jobman(config) {
       done = false
     },
     end: function(reason) {
-      man.reason = reason || ''
+      end(man.reason = reason)
+      man.running.forEach(function(job){
+        job.state = 'cancel'
+      })
       jobs.splice(0, jobs.length)
-      run=0
-      check()
     },
     get config (){ return config },
     set config (val){ config = val },
@@ -64,6 +65,12 @@ function jobman(config) {
     clearInterval(interJob)
     interJob=null
   }
+
+  function end(){
+    done = true
+    config.allEnd && config.allEnd(man)
+    stop()
+  }
   
   function pendingJob (jobObj) {
     return !jobObj.hasOwnProperty('state')
@@ -99,9 +106,7 @@ function jobman(config) {
     if(!jobObj) {
       if(!run && !done) {
         // console.log('all done')
-        done = true
-        config.allEnd && config.allEnd(man)
-        stop()
+        end()
       }
       return
     }
@@ -114,8 +119,8 @@ function jobman(config) {
     done = false
     jobObj.state='run'
     jobObj.fn(function next(err){
-      if(jobObj.state==='timeout') return
       if(jobObj._tID) clearTimeout(jobObj._tID)
+      if(/timeout|cancel/.test(jobObj.state)) return
       if(err!=null) jobObj.state = 'error'
       else jobObj.state = 'done'
       run--
