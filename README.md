@@ -24,12 +24,15 @@ const man = jobman({  // create new jobman object
     if(job.prop==5) return false  // return FALSE will cancel the job
   },
   jobEnd: (job, man)=>{  // when A job did end
-    console.log('result: ', job.prop, man.lastError || 'ok')
+    console.log('result: ', job.prop, job.error || 'ok')
   },
   jobTimeout: (job, man)=>{  // when A job timeout
     console.log('timeout: ', job.prop)
   },
-  allEnd: man=>{  // all jobs done
+  allEnd: (info, man)=>{  // all jobs will start
+    console.log('all jobs will start')
+  },
+  allEnd: (info, man)=>{  // all jobs done
     console.log('all end', man.done)
     man.end()  // release all job memory
   },
@@ -58,6 +61,7 @@ function task(i, done){  // dummy task function
 The result:
 
 ```
+all jobs will start
 timeout:  { id: 'insert to first!', timeout: 500 }
 result:  0 ok
 result:  1 ok
@@ -94,12 +98,12 @@ all end true
 - *manObject*
   - man.add([position:int], jobFn:cb=>{}, jobProp:any)
     > **jobFn is with callback for one job, cb(err) have to be called for each job. jobProp will become job.prop**
-  - man.end([reason])
-    > **Remove all jobs with reason, will release memory, cancel running jobs, trigger man.allEnd with man.reason set to reason.**
+  - man.start([info])
+    > **function to start current jobman, use man.stop to stop it, trigger man.allStart with first arg set to info**
   - man.stop()
     > **function to stop current jobman, use man.start to start again**
-  - man.start()
-    > **function to start current jobman, use man.stop to stop it**
+  - man.end([info])
+    > **Remove all jobs with info, will release memory, cancel running jobs, trigger man.allEnd with first arg set to info**
   - man.config *object*
     > **the config object passed into jobman**
   - man.jobs *array*
@@ -114,14 +118,12 @@ all end true
     > **prop to get running jobs in process**
   - man.slot *int*
     > **prop to get current available job runner slot**
-  - man.lastError *any*
-    > **will set to the job error object after each end of job callback**
-  - man.reason *any*
-    > **reason to end jobman by user**
 
 - *jobObject*
   - job.fn *function*
     > **the jobFn function passed into man.add()**
+  - job.error *any*
+    > **when job callback called with error, set to it with the error**
   - job.prop *any*
     > **the prop to passed into man.add()**
   - job.prop.timeout *int*

@@ -127,7 +127,7 @@ function jobman(config) {
       if(err!=null) jobObj.state = 'error'
       else jobObj.state = 'done'
       run--
-      man.lastError = err
+      jobObj.error = err
       config.jobEnd && config.jobEnd(jobObj, man)
     })
     

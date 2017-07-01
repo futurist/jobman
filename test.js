@@ -71,10 +71,10 @@ ava.cb('example test', t=>{
       if(man.pending.length==0) console.log('queue empty')
     },
     jobEnd: (job, man)=>{
-      // console.log(job.prop, man.done, man.pending, man.lastError, man.slot)
+      // console.log(job.prop, man.done, man.pending, man.slot)
       t.is(job.prop, testProps.shift())
       t.is(man.done, false)
-      if(job.prop==3) t.is(man.lastError, 'bad')
+      if(job.error) t.is(job.error, 'bad')
     },
     autoStart: true
   })
