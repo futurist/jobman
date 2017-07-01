@@ -222,8 +222,8 @@ ava.cb('man.end', t=>{
     }
   })
   
-  man.end()
-  t.is(count, 1)
+  man.end()  // when done, not call allEnd
+  t.is(count, 0)
   t.is(man.running.length, 0)
 
   man.add(cb=>setTimeout(cb,100))
@@ -235,7 +235,7 @@ ava.cb('man.end', t=>{
   setTimeout(()=>{
     t.is(man.running.length, 1)
     man.end()
-    t.is(count, 2)
+    t.is(count, 1)
     t.is(man.running.length, 0)
     t.is(man.done, true)
     t.deepEqual(man.jobs, [])

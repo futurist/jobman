@@ -68,9 +68,10 @@ function jobman(config) {
   }
 
   function end(){
+    stop()
+    if(done) return
     done = true
     config.allEnd && config.allEnd(man)
-    stop()
   }
   
   function pendingJob (jobObj) {
