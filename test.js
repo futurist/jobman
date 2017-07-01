@@ -4,7 +4,7 @@ const jobman = require('./')
 
 ava.cb('end test', t=>{
   var d = jobman({
-    allEnd: man=>{
+    allEnd: (info, man)=>{
       // console.log('all end', man.jobs)
       t.deepEqual(man.jobs, [])
       t.deepEqual(man.done, true)
@@ -43,7 +43,7 @@ ava.cb('example test', t=>{
 
   let man = jobman({
     max: 3,
-    allEnd: man=>{
+    allEnd: (info, man)=>{
       // console.log('all end', man.done)
       // console.log('all state', man.jobs.map(fn=>fn.state))
       t.is(man.done, true)
@@ -108,7 +108,7 @@ ava.cb('promise test', t=>{
       console.log(job.prop, job.state, 'end')
       t.is(job.prop, d++)
     },
-    allEnd: man=>t.end()
+    allEnd: (info, man)=>t.end()
   })
 
   for(let i=0;i<5;i++){
@@ -142,7 +142,7 @@ ava.cb('timeout', t=>{
       t.is(job.prop.id, endID.shift())
       console.log(new Date, job.prop, job.state, 'end')
     },
-    allEnd: man=>t.end()
+    allEnd: (info, man)=>t.end()
   })
 
   for(let i=0;i<5;i++){
@@ -173,7 +173,7 @@ ava.cb('timeout renew', t=>{
       ++count
       return false
     },
-    allEnd: man=>t.end()
+    allEnd: (info, man)=>t.end()
   })
   man.start()
 
@@ -203,7 +203,7 @@ ava.cb('get/set config', t=>{
           t.is(man.config.jobStart, undefined)
           t.is(man.slot, 1)
         },
-        allEnd: man=>t.end()
+        allEnd: (info, man)=>t.end()
       }
     }
   })
@@ -212,13 +212,17 @@ ava.cb('get/set config', t=>{
   man.start()
 })
 
-ava.cb('man.end', t=>{
+ava.cb('man.start & end', t=>{
   var count=0
+  var startState = 0
   var man = jobman({
     max: 1,
-    allEnd: man=>{
+    allStart: (info, man)=>{
+      startState+=info
+    },
+    allEnd: (info, man)=>{
       count++
-      if(count==1) t.is('reason' in man, true)
+      if(count==1) t.is(info, 'my reason')
     }
   })
   
@@ -229,12 +233,12 @@ ava.cb('man.end', t=>{
   man.add(cb=>setTimeout(cb,100))
   man.add(cb=>setTimeout(cb,200))
   man.add(cb=>setTimeout(cb,300))
-  man.start()
-
+  man.start(10)
+  t.is(startState, 10)
 
   setTimeout(()=>{
     t.is(man.running.length, 1)
-    man.end()
+    man.end('my reason')
     t.is(count, 1)
     t.is(man.running.length, 0)
     t.is(man.done, true)

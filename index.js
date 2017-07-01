@@ -24,7 +24,7 @@ function jobman(config) {
       done = false
     },
     end: function(reason) {
-      end(man.reason = reason)
+      end(reason)
       man.running.forEach(function(job){
         job.state = 'cancel'
       })
@@ -53,11 +53,12 @@ function jobman(config) {
     start: start,
   }
 
-  function start(){
+  function start(info) {
     if(interJob) {
       // console.warn('already started')
       return false
     }
+    config.allStart && config.allStart(info, man)
     interJob = setInterval(check)
     check()
   }
@@ -67,11 +68,11 @@ function jobman(config) {
     interJob=null
   }
 
-  function end(){
+  function end(reason){
     stop()
     if(done) return
     done = true
-    config.allEnd && config.allEnd(man)
+    config.allEnd && config.allEnd(reason, man)
   }
   
   function pendingJob (jobObj) {
