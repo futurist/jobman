@@ -34,6 +34,8 @@ const man = jobman({  // create new jobman object
   },
   allEnd: (info, man)=>{  // all jobs done
     console.log('all end', man.isDone)
+    // also clear all pending jobs, cancel running callbacks
+    man.clear(true)
   },
   autoStart: true  // start monitor when create
 })
