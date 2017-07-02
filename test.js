@@ -354,3 +354,44 @@ ava.cb('man.clear with true', t=>{
 
 })
 
+
+ava.cb('man.end with true', t=>{
+  var count=0
+  var jobCount = 0
+  var man = jobman({
+    max: 1,
+    allEnd: (info, man)=>{
+      count++
+    },
+    jobEnd: job=>{
+      jobCount++
+    }
+  })
+  
+  man.add(cb=>setTimeout(cb,100),1)
+  man.add(cb=>setTimeout(cb,200),2)
+  man.add(cb=>setTimeout(cb,300),3)
+  man.start()
+
+  setTimeout(()=>{
+    t.is(man.running.length, 1)
+    man.end(null, true)
+    t.is(count, 1)
+    t.is(man.isDone, true)
+    t.is(man.running.length, 1)
+    t.is(man.pending.length, 0)
+    t.is(man.jobs.length, 3)
+  }, 50)
+
+  setTimeout(()=>{
+    t.is(man.jobs.length, 3)
+    t.is(man.running.length, 0)
+    t.is(man.pending.length, 0)
+    t.is(count, 1)
+    t.is(jobCount, 1)
+    t.is(man.isDone, true)
+    t.end()
+  }, 350)
+
+})
+

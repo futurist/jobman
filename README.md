@@ -107,8 +107,8 @@ all end true
     > **function to start current jobman, use man.stop to stop it, trigger man.allStart with first arg set to info**
   - man.stop()
     > **function to stop current jobman, use man.start to start again**
-  - man.end([info])
-    > **trigger man.allEnd with first arg set to info**
+  - man.end([info], [cancelPending])
+    > **trigger man.allEnd with first arg set to info, cancelPending will cancel pending jobs**
   - man.clear(cancelRunningJobs)
     > **Remove all pending jobs, cancel running jobs if cancelRunningJobs is true**
   - man.config *object*

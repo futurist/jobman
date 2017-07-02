@@ -77,9 +77,14 @@ function jobman(config) {
          last job will trigger allEnd normally.
   end + clear: trigger allEnd now, +clear effects.
   */
-  function end(info){
+  function end(info, cancelPending){
     stop()
     if(done) return
+    if(cancelPending){
+      man.pending.forEach(function(job){
+        job.state = 'cancel'
+      })
+    }
     done = true
     config.allEnd && config.allEnd(info, man)
   }
