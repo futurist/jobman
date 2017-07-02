@@ -221,16 +221,17 @@ ava.cb('man.start & end', t=>{
     allEnd: (info, man)=>{
       count++
       if(count==1) t.is(info, 'my reason')
-    }
+    },
+    jobEnd: job=>console.log(job.prop, '--------')
   })
   
   man.end()  // when isDone, not call allEnd
   t.is(count, 0)
   t.is(man.running.length, 0)
 
-  man.add(cb=>setTimeout(cb,100))
-  man.add(cb=>setTimeout(cb,200))
-  man.add(cb=>setTimeout(cb,300))
+  man.add(cb=>setTimeout(cb,100),1)
+  man.add(cb=>setTimeout(cb,200),2)
+  man.add(cb=>setTimeout(cb,300),3)
   man.start(10)
   t.is(startState, 10)
 
@@ -238,10 +239,96 @@ ava.cb('man.start & end', t=>{
     t.is(man.running.length, 1)
     man.end('my reason')
     t.is(count, 1)
-    t.is(man.running.length, 0)
     t.is(man.isDone, true)
-    t.deepEqual(man.jobs, [])
-    t.deepEqual(man.pending, [])
+    t.is(man.running.length, 1)
+  }, 50)
+
+  setTimeout(()=>{
+    t.is(count, 1)
+    t.is(man.isDone, true)
+    t.is(man.running.length, 0)
+    t.deepEqual(man.jobs.length, 3)
+    t.deepEqual(man.pending.length, 2)
+
+    t.end()
+  }, 550)
+})
+
+
+ava.cb('man.clear', t=>{
+  var count=0
+  var jobCount = 0
+  var man = jobman({
+    max: 1,
+    allEnd: (info, man)=>{
+      count++
+    },
+    jobEnd: job=>{
+      jobCount++
+    }
+  })
+  
+  man.add(cb=>setTimeout(cb,100),1)
+  man.add(cb=>setTimeout(cb,200),2)
+  man.add(cb=>setTimeout(cb,300),3)
+  man.start()
+
+  setTimeout(()=>{
+    t.is(man.running.length, 1)
+    man.clear()
+    t.is(count, 0)
+    t.is(man.isDone, false)
+    t.is(man.running.length, 0)
+    t.is(man.jobs.length, 0)
+  }, 50)
+
+  setTimeout(()=>{
+    t.is(man.jobs.length, 0)
+    t.is(man.running.length, 0)
+    t.is(count, 1)
+    t.is(jobCount, 1)
+    t.is(man.isDone, true)
     t.end()
   }, 150)
+
 })
+
+
+ava.cb('man.clear with true', t=>{
+  var count=0
+  var jobCount = 0
+  var man = jobman({
+    max: 1,
+    allEnd: (info, man)=>{
+      count++
+    },
+    jobEnd: job=>{
+      jobCount++
+    }
+  })
+  
+  man.add(cb=>setTimeout(cb,100),1)
+  man.add(cb=>setTimeout(cb,200),2)
+  man.add(cb=>setTimeout(cb,300),3)
+  man.start()
+
+  setTimeout(()=>{
+    t.is(man.running.length, 1)
+    man.clear(true)
+    t.is(count, 0)
+    t.is(man.isDone, false)
+    t.is(man.running.length, 0)
+    t.is(man.jobs.length, 0)
+  }, 50)
+
+  setTimeout(()=>{
+    t.is(man.jobs.length, 0)
+    t.is(man.running.length, 0)
+    t.is(count, 1)
+    t.is(jobCount, 0)
+    t.is(man.isDone, true)
+    t.end()
+  }, 150)
+
+})
+

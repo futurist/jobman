@@ -23,6 +23,16 @@ function jobman(config) {
       // if(interJob) check()
       done = false
     },
+    clear: function(cancelRunning){
+      // cleanup
+      if(cancelRunning){
+        man.running.forEach(function(job){
+          job.state = 'cancel'
+        })
+      }
+      run = 0
+      jobs.splice(0, jobs.length)
+    },
     get config (){ return config },
     set config (val){ config = val },
     get jobs (){ return jobs },
@@ -61,18 +71,17 @@ function jobman(config) {
     interJob=null
   }
 
+  /*
+  end: stop + trigger allEnd now, but jobs running will trigger jobEnd later
+  clear: no more new jobs, running jobs will trigger jobEnd if not pass "true" arg
+         last job will trigger allEnd normally.
+  end + clear: trigger allEnd now, +clear effects.
+  */
   function end(info){
     stop()
     if(done) return
     done = true
     config.allEnd && config.allEnd(info, man)
-
-    // cleanup
-    man.running.forEach(function(job){
-      job.state = 'cancel'
-    })
-    run = 0
-    jobs.splice(0, jobs.length)
   }
   
   function pendingJob (jobObj) {

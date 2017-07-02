@@ -104,7 +104,9 @@ all end true
   - man.stop()
     > **function to stop current jobman, use man.start to start again**
   - man.end([info])
-    > **Remove all jobs with info, will release memory, cancel running jobs, trigger man.allEnd with first arg set to info**
+    > **trigger man.allEnd with first arg set to info**
+  - man.clear(cancelRunningJobs)
+    > **Remove all pending jobs, cancel running jobs if cancelRunningJobs is true**
   - man.config *object*
     > **the config object passed into jobman**
   - man.jobs *array*
