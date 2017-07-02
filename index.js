@@ -62,7 +62,7 @@ function jobman(config) {
       return false
     }
     config.allStart && config.allStart(info, man)
-    interJob = setInterval(check)
+    interJob = setInterval(check, config.interval)
     check()
   }
 

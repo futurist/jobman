@@ -85,6 +85,8 @@ all end true
     > **max number of concurrence jobs.**
   - config.timeout *int*
     > **ms to wait for --A job--, trigger jobTimeout event after the time**
+  - config.interval *int*
+    > **ms to pass into setInterval check internally**
   - config.jobTimeout *fn(job, man)->boolean*
     > **callback function after --A job-- timeout, return false will book another timeout**
   - config.jobStart *fn(job, man)->boolean*

@@ -210,6 +210,28 @@ ava.cb('get/set config', t=>{
   man.start()
 })
 
+
+ava.cb('config.interval', t=>{
+  var count=0
+  var man = jobman({
+    max: 1,
+    interval: 1000,
+    jobStart: job=>{
+      count++
+    }
+  })
+
+  man.add(cb=>setTimeout(cb, 100))
+  man.add(cb=>setTimeout(cb, 100))
+  man.start()
+  setTimeout(()=>{
+    t.is(man.running.length, 0)
+    t.is(man.pending.length, 1)
+    t.end()
+  },300)
+})
+
+
 ava.cb('man.start & end', t=>{
   var count=0
   var startState = 0
