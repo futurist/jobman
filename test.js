@@ -7,24 +7,22 @@ ava.cb('end test', t=>{
     allEnd: (info, man)=>{
       // console.log('all end', man.jobs)
       t.deepEqual(man.jobs, [])
-      t.deepEqual(man.done, true)
+      t.deepEqual(man.isDone, true)
       t.end()
     }
   })
-  // console.log(d.stopped, d.done)
-  t.is(d.stopped, true)
-  t.is(d.done, true)
+  t.is(d.isRunning, false)
+  t.is(d.isDone, true)
   d.start()
-  // console.log(d.stopped, d.done)
-  t.is(d.stopped, false)
-  t.is(d.done, true)
+  t.is(d.isRunning, true)
+  t.is(d.isDone, true)
 
   d.add(cb=>setTimeout(cb, 1000))
   d.add(cb=>setTimeout(cb, 1000))
   d.add(cb=>setTimeout(cb, 1000))
 
-  t.is(d.stopped, false)
-  t.is(d.done, false)
+  t.is(d.isRunning, true)
+  t.is(d.isDone, false)
 
   d.jobs.splice(0,3)
 
@@ -34,19 +32,19 @@ ava.cb('example test', t=>{
   const testProps = [
     'insert to first!', 0,1,2,3,4,6,7,8,9
   ]
-  function task(i, done){
+  function task(i, cb){
     setTimeout(()=>{
       console.log('task '+i)
-      done(i==3 ? 'bad' : null)
+      cb(i==3 ? 'bad' : null)
     }, 1000)
   }
 
   let man = jobman({
     max: 3,
     allEnd: (info, man)=>{
-      // console.log('all end', man.done)
+      // console.log('all end', man.isDone)
       // console.log('all state', man.jobs.map(fn=>fn.state))
-      t.is(man.done, true)
+      t.is(man.isDone, true)
       t.is(man.pending.length, 0)
       t.deepEqual(man.jobs.map(fn=>fn.state), 
         [ 'done',
@@ -67,13 +65,13 @@ ava.cb('example test', t=>{
     },
     jobRun: (job, man)=>{
       t.is(job.state, 'run')
-      t.is(man.stopped, false)
+      t.is(man.isRunning, true)
       if(man.pending.length==0) console.log('queue empty')
     },
     jobEnd: (job, man)=>{
-      // console.log(job.prop, man.done, man.pending, man.slot)
+      // console.log(job.prop, man.isDone, man.pending, man.slot)
       t.is(job.prop, testProps.shift())
-      t.is(man.done, false)
+      t.is(man.isDone, false)
       if(job.error) t.is(job.error, 'bad')
     },
     autoStart: true
@@ -226,7 +224,7 @@ ava.cb('man.start & end', t=>{
     }
   })
   
-  man.end()  // when done, not call allEnd
+  man.end()  // when isDone, not call allEnd
   t.is(count, 0)
   t.is(man.running.length, 0)
 
@@ -241,7 +239,7 @@ ava.cb('man.start & end', t=>{
     man.end('my reason')
     t.is(count, 1)
     t.is(man.running.length, 0)
-    t.is(man.done, true)
+    t.is(man.isDone, true)
     t.deepEqual(man.jobs, [])
     t.deepEqual(man.pending, [])
     t.end()

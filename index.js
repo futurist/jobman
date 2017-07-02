@@ -23,22 +23,14 @@ function jobman(config) {
       // if(interJob) check()
       done = false
     },
-    end: function(reason) {
-      end(reason)
-      man.running.forEach(function(job){
-        job.state = 'cancel'
-      })
-      run = 0
-      jobs.splice(0, jobs.length)
-    },
     get config (){ return config },
     set config (val){ config = val },
     get jobs (){ return jobs },
-    get done () {
+    get isDone () {
       return done
     },
-    get stopped () {
-      return interJob == null
+    get isRunning () {
+      return interJob != null
     },
     get pending (){
       return jobs.filter(pendingJob)
@@ -51,6 +43,7 @@ function jobman(config) {
     },
     stop: stop,
     start: start,
+    end: end,
   }
 
   function start(info) {
@@ -68,11 +61,18 @@ function jobman(config) {
     interJob=null
   }
 
-  function end(reason){
+  function end(info){
     stop()
     if(done) return
     done = true
-    config.allEnd && config.allEnd(reason, man)
+    config.allEnd && config.allEnd(info, man)
+
+    // cleanup
+    man.running.forEach(function(job){
+      job.state = 'cancel'
+    })
+    run = 0
+    jobs.splice(0, jobs.length)
   }
   
   function pendingJob (jobObj) {

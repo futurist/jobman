@@ -29,12 +29,11 @@ const man = jobman({  // create new jobman object
   jobTimeout: (job, man)=>{  // when A job timeout
     console.log('timeout: ', job.prop)
   },
-  allEnd: (info, man)=>{  // all jobs will start
+  allStart: (info, man)=>{  // all jobs will start
     console.log('all jobs will start')
   },
   allEnd: (info, man)=>{  // all jobs done
-    console.log('all end', man.done)
-    man.end()  // release all job memory
+    console.log('all end', man.isDone)
   },
   autoStart: true  // start monitor when create
 })
@@ -49,10 +48,10 @@ man.add(0, cb=>{  // insert A job into 0 index
   task(99, cb)
 }, {id: 'insert to first!', timeout: 500})  // the job timeout is 500ms
 
-function task(i, done){  // dummy task function
+function task(i, cb){  // dummy task function
   setTimeout(()=>{
-    if(i==3) done('bad')  // done with error
-    else done()  // done with ok
+    if(i==3) cb('bad')  // cb with error
+    else cb()  // cb with ok
   }, 1000)  // async happen at 1 second
 }
 
@@ -92,8 +91,10 @@ all end true
     > **callback function after --A job-- did start, job.state become run**
   - config.jobEnd *fn(job, man)->void*
     > **callback function after --A job-- callback invoked, with man.lastError set to result error**
-  - config.allEnd *fn(man)->void*
-    > **callback function when --ALL job-- finished run**
+  - config.allStart *fn(info, man)->void*
+    > **callback function before --ALL job-- start run, useful for init, info is user passed with man.start(info)**
+  - config.allEnd *fn(info, man)->void*
+    > **callback function when --ALL job-- finished run, info is user passed with man.end(info)**
 
 - *manObject*
   - man.add([position:int], jobFn:cb=>{}, jobProp:any)
@@ -108,9 +109,9 @@ all end true
     > **the config object passed into jobman**
   - man.jobs *array*
     > **the jobs array internally, query for it for state, length etc.**
-  - man.stopped *boolean*
-    > **prop to get if the job monitor is stopped (not running)**
-  - man.done *boolean*
+  - man.isRunning *boolean*
+    > **prop to get if the job monitor is is running (not stopped)**
+  - man.isDone *boolean*
     > **prop to get if all job ended**
   - man.pending *[jobObject, ...]*
     > **prop to get pending jobs in queue**
