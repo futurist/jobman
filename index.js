@@ -10,6 +10,7 @@ function jobman(config) {
   var interJob
   var done = true
   var run = 0
+  var startCount = 0
 
   const jobs = []
   const man = {
@@ -22,6 +23,7 @@ function jobman(config) {
       }
       // if(interJob) check()
       done = false
+      if(startCount>0) start()
     },
     clear: function(cancelRunning){
       // cleanup
@@ -61,6 +63,7 @@ function jobman(config) {
       // console.warn('already started')
       return false
     }
+    startCount++
     config.allStart && config.allStart(info, man)
     interJob = setInterval(check, config.interval)
     check()

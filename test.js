@@ -395,3 +395,30 @@ ava.cb('man.end with true', t=>{
 
 })
 
+
+ava.cb('man.allEnd should stop interval', t=>{
+  let count = 0
+  var man = jobman({
+    max: 1,
+    allEnd: (info, man)=>{
+      if(count++)return
+      setTimeout(()=>{
+        t.is(man.isRunning, false)
+        man.add(cb=>setTimeout(cb, 100))
+        setTimeout(()=>{
+          t.is(man.isRunning, true)
+        },33)
+        setTimeout(()=>{
+          t.is(man.isRunning, false)
+          t.end()
+        }, 200)
+      })
+    }
+  })
+  
+  man.add(cb=>setTimeout(cb,100),1)
+  man.add(cb=>setTimeout(cb,200),2)
+  man.add(cb=>setTimeout(cb,300),3)
+  man.start()
+
+})
