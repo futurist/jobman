@@ -405,9 +405,7 @@ ava.cb('man.allEnd should stop interval', t=>{
       setTimeout(()=>{
         t.is(man.isRunning, false)
         man.add(cb=>setTimeout(cb, 100))
-        setTimeout(()=>{
-          t.is(man.isRunning, true)
-        },33)
+        t.is(man.isRunning, true)
         setTimeout(()=>{
           t.is(man.isRunning, false)
           t.end()
