@@ -125,6 +125,8 @@ all end true
     > **prop to get running jobs in process**
   - man.slot *int*
     > **prop to get current available job runner slot**
+  - man.startCount *int*
+    > **jobman start counter, from 0, after first start() will be 1, after next start() plus 1**
 
 - *jobObject*
   - job.fn *function*
