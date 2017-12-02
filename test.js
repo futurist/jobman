@@ -420,3 +420,29 @@ ava.cb('man.allEnd should stop interval', t=>{
   man.start()
 
 })
+
+
+ava.cb('man.startCount', t=>{
+  var man = jobman({
+    max: 1,
+    allEnd: (info, man)=>{
+      t.is(man.startCount, 2)
+      t.end()
+    }
+  })
+  
+  t.is(man.startCount, 0)
+  man.add(cb=>setTimeout(cb,100),1)
+  man.add(cb=>setTimeout(cb,200),2)
+  man.add(cb=>setTimeout(cb,300),3)
+
+  t.is(man.startCount, 0)
+  man.start()
+  t.is(man.startCount, 1)
+  
+  man.stop()
+  man.start()
+  t.is(man.startCount, 2)
+
+  
+})

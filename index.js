@@ -38,6 +38,7 @@ function jobman(config) {
     get config (){ return config },
     set config (val){ config = val },
     get jobs (){ return jobs },
+    get startCount (){ return startCount },
     get isDone () {
       return done
     },
@@ -63,10 +64,10 @@ function jobman(config) {
       // console.warn('already started')
       return false
     }
-    startCount++
     config.allStart && config.allStart(info, man)
     interJob = setInterval(check, config.interval)
     check()
+    startCount++
   }
 
   function stop(){
